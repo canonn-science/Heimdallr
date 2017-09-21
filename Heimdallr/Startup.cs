@@ -41,13 +41,13 @@ namespace Heimdallr
             {
                 app.UseDeveloperExceptionPage();
                 app.UseBrowserLink();
+                app.UseStaticFiles();
             }
             else
             {
                 app.UseExceptionHandler("/Home/Error");
             }
 
-            app.UseStaticFiles();
 
             app.UseMvc(routes =>
             {
