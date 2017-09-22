@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Heimdallr.Settings;
 
 namespace Heimdallr
 {
@@ -27,8 +28,15 @@ namespace Heimdallr
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Configuration
+            services.Configure<UnknownSiteSettings>(Configuration.GetSection("UnknownSite"));
+            services.Configure<GuardianRuinSettings>(Configuration.GetSection("GuardianRuin"));
+
+
+
             // Add framework services.
             services.AddMvc();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,7 +53,7 @@ namespace Heimdallr
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Lookup/Error");
             }
 
 
