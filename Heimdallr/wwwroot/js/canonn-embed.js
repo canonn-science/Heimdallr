@@ -27,7 +27,7 @@
                     //Get blockquote info
                     var frame = matchFrames[i];
 
-                    frame.style.height = data.height
+                    frame.height = data.height
                     
                 }
 
