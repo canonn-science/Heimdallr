@@ -33,10 +33,15 @@ div {
 .canonn-thumbnail img {
     margin: auto;
     display: block;
+    max-height: 200px;
 }
 
-strong {
-    color: #777 !important;
+h1.ts-inactive {
+    background-color: #4e4e4e !important
+}
+
+h1.ts-active {
+    background-color: #cd4d26 !important;
 }
 
 p {

@@ -33,17 +33,8 @@ namespace Heimdallr
             services.Configure<ThargoidSiteSettings>(Configuration.GetSection("ThargoidSite"));
             services.Configure<GuardianRuinSettings>(Configuration.GetSection("GuardianRuin"));
 
-            //Get the Configuration Section
-            var sp = services.BuildServiceProvider();
-
-            // Resolve the services from the service provider
-            services.AddSingleton<ThargoidSiteData>(new ThargoidSiteData(sp.GetService<IOptions<ThargoidSiteSettings>>()));
-
-
-
             // Add framework services.
             services.AddMvc();
-            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
