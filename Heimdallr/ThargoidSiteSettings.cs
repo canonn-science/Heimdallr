@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Heimdallr.Settings
 {
-    public class UnknownSiteSettings
+    public class ThargoidSiteSettings
     {
         public string resourceLocation { get; set; }
     }

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Heimdallr.Settings;
+using Microsoft.Extensions.Options;
 
 namespace Heimdallr
 {
@@ -29,8 +30,14 @@ namespace Heimdallr
         public void ConfigureServices(IServiceCollection services)
         {
             //Configuration
-            services.Configure<UnknownSiteSettings>(Configuration.GetSection("UnknownSite"));
+            services.Configure<ThargoidSiteSettings>(Configuration.GetSection("ThargoidSite"));
             services.Configure<GuardianRuinSettings>(Configuration.GetSection("GuardianRuin"));
+
+            //Get the Configuration Section
+            var sp = services.BuildServiceProvider();
+
+            // Resolve the services from the service provider
+            services.AddSingleton<ThargoidSiteData>(new ThargoidSiteData(sp.GetService<IOptions<ThargoidSiteSettings>>()));
 
 
 

@@ -15,13 +15,13 @@ namespace Heimdallr.Controllers
 {
     public class LookupController : Controller
     {
-        private readonly IOptions<UnknownSiteSettings> _unknownSiteSettings;
+        private readonly IOptions<ThargoidSiteSettings> _thargoidSiteSettings;
         private readonly IOptions<GuardianRuinSettings> _guardianRuinSettings;
         
 
-        public LookupController(IOptions<UnknownSiteSettings> unknownSiteSettings, IOptions<GuardianRuinSettings> guardianRuinSettings)
+        public LookupController(IOptions<ThargoidSiteSettings> thargoidSiteSettings, IOptions<GuardianRuinSettings> guardianRuinSettings)
         {
-            _unknownSiteSettings = unknownSiteSettings;
+            _thargoidSiteSettings = thargoidSiteSettings;
             _guardianRuinSettings = guardianRuinSettings;
         }
 
@@ -102,8 +102,6 @@ namespace Heimdallr.Controllers
                 
 
             }
-
-            
         }
 
     }
