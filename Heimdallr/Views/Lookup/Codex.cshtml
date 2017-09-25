@@ -1,8 +1,37 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model Heimdallr.Models.CanonnEntry
+
+@{
+    ViewData["Title"] = @Model.title;
+    ViewData["Heading"] = @Model.title;
+    ViewData["ResourceLink"] = Model.ItemLink();
 }
 
-<h3>@ViewData["Message"]</h3>
-<div>
-    Codex Content Here
+<div class="row">
+    &nbsp;
+</div>
+
+<div class="row">
+    @if (Model.mediaLink.Length > 0)
+    {
+    <div class="col-xs-3 col-md-2">
+        <div class="row">
+            <div class="col-xs-12 canonn-thumbnail">
+                <img src="@Model.mediaLink" class="img-responsive" />
+            </div>
+        </div>
+    </div>
+    }
+
+    <div class="@((Model.mediaLink.Length > 0) ? "col-xs-9 col-md-10" : "col-xs-12")">
+        <div class="row">
+            <div class="col-md-12">
+               @((Model.excerpt.ToString().Length > 0) ? @Html.Raw(Model.excerpt) : @Html.Raw(Model.content))
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <a href="@ViewData["ResourceLink"]" target="_blank">Continue on Canonn.Science</a>
+            </div>
+        </div>
+    </div>
 </div>

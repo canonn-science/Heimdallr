@@ -32,6 +32,8 @@ namespace Heimdallr
             //Configuration
             services.Configure<ThargoidSiteSettings>(Configuration.GetSection("ThargoidSite"));
             services.Configure<GuardianRuinSettings>(Configuration.GetSection("GuardianRuin"));
+            services.Configure<CanonnWebAPISettings>(Configuration.GetSection("CanonnWebAPI"));
+            
 
             // Add framework services.
             services.AddMvc();
@@ -45,7 +47,7 @@ namespace Heimdallr
 
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                //app.UseDeveloperExceptionPage();
                 app.UseBrowserLink();
                 app.UseStaticFiles();
             }

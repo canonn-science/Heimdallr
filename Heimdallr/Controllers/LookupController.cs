@@ -12,6 +12,8 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Text;
+using System.Net;
 
 namespace Heimdallr.Controllers
 {
@@ -19,12 +21,15 @@ namespace Heimdallr.Controllers
     {
         private readonly IOptions<ThargoidSiteSettings> _thargoidSiteSettings;
         private readonly IOptions<GuardianRuinSettings> _guardianRuinSettings;
-        
+        private readonly IOptions<CanonnWebAPISettings> _canonnWebAPISettings;
 
-        public LookupController(IOptions<ThargoidSiteSettings> thargoidSiteSettings, IOptions<GuardianRuinSettings> guardianRuinSettings)
+
+
+        public LookupController(IOptions<ThargoidSiteSettings> thargoidSiteSettings, IOptions<GuardianRuinSettings> guardianRuinSettings, IOptions<CanonnWebAPISettings> canonnWebAPISettings)
         {
             _thargoidSiteSettings = thargoidSiteSettings;
             _guardianRuinSettings = guardianRuinSettings;
+            _canonnWebAPISettings = canonnWebAPISettings;
         }
 
         public IActionResult Index()
@@ -159,11 +164,136 @@ namespace Heimdallr.Controllers
             return View("ThargoidSite", matchingSite);
         }
 
-        [Route("/Lookup/{query}")]
+
+        private IActionResult CodexPostByPath(string postSlug)
+        {
+            
+            ViewData["Message"] = "Some Codex Post with Slug " + postSlug;
+            return View("Codex");
+        }
+
+        private IActionResult CodexPageByPath(string pageRef)
+        {
+
+            ViewData["Message"] = "Some Codex Page by URL " + pageRef;
+            return View("Codex");
+        }
+
+        [Route("/Lookup/{*query}")]
         public IActionResult Codex(string query)
         {
-            ViewData["Message"] = "Query for " + query;
-            return View("Codex");
+            StringBuilder apiCall = new StringBuilder(_canonnWebAPISettings.Value.resourceLocation);
+            
+
+            //Ruin map direct link [https://ruins.canonn.technology/#GR25 OR https://ruins.canonn.technology/#GS25]
+            MatchCollection thargoidCheck = Regex.Matches(query, ".*ruins.canonn.technology/#(GR|GS)([0-9]+)");
+            if (thargoidCheck.Count == 1)
+            {
+                //Query param is the site number.  
+                query = thargoidCheck[0].Groups[2].Value;
+                return ThargoidSite(Int32.Parse(query));
+            }
+
+            //Codex entry? [https://canonn.science/codex/unknown-probe/]
+            MatchCollection codexCheck = Regex.Matches(query, ".*canonn.science/codex/(.*)");
+
+            //Lore entry? [https://canonn.science/lore/]
+            MatchCollection loreCheck = Regex.Matches(query, ".*canonn.science/(.*)");
+
+
+            if (codexCheck.Count == 1)
+            {
+                //Query param is the codex page (removing any trailing paths)
+                query = codexCheck[0].Groups[1].Value.Replace("/", "");
+
+                apiCall.Append("posts?slug=");
+                apiCall.Append(WebUtility.UrlEncode(query));
+            }else if (loreCheck.Count == 1)
+            {
+                //Query param is the page path (removing any trailing paths)
+                query = loreCheck[0].Groups[1].Value.Replace("/","");
+
+                apiCall.Append("pages?slug=");
+                apiCall.Append(WebUtility.UrlEncode(query));
+
+            }else
+            {
+                //Query param is the search term
+                apiCall.Append("posts?search=");
+                apiCall.Append(WebUtility.UrlEncode(query));
+
+            }
+
+            string apiJSON = "";
+            try
+            {
+                apiJSON = Task.Run(() =>
+                {
+                    return GetUrlContents(apiCall.ToString());
+                }).Result;
+            }
+            catch (Exception ex)
+            {
+                Exception asyncEx = ex.GetBaseException();
+                //Error thrown from the backend api such as a 500 when we send an invalid ID?
+                if (asyncEx is HttpRequestException)
+                {
+                    //TODO: Add direct search handling https://canonn.science/?s=example
+                    throw new Exception("Unable to find the specified entry on the Canonn website.");
+                }
+
+                //No.  Log it
+                //TODO: Log exception here
+                throw new Exception("Unexpected error when trying to retrieve the entry from the Canonn website");
+            }
+
+            CanonnEntry[] canonnEntries = JsonConvert.DeserializeObject<CanonnEntry[]>(apiJSON);
+
+            if(canonnEntries.Length < 1)
+            {
+                throw new Exception("Unable to find the specified entry on the Canonn website.");
+            }
+
+            CanonnEntry entryModel = canonnEntries[0];
+            entryModel.mediaLink = "";
+
+            
+            //Media item?
+            if(entryModel.featured_media > 0)
+            {
+                string mediaJSON = "";
+                StringBuilder mediaCall = new StringBuilder(_canonnWebAPISettings.Value.resourceLocation);
+                mediaCall.Append("media/");
+                mediaCall.Append(entryModel.featured_media);
+
+                try
+                {
+                    mediaJSON = Task.Run(() =>
+                    {
+                        return GetUrlContents(mediaCall.ToString());
+                    }).Result;
+
+                    CanonnMedia canonnMedia = JsonConvert.DeserializeObject<CanonnMedia>(mediaJSON);
+
+                    entryModel.mediaLink = canonnMedia.source_url;
+
+
+                }
+                catch (Exception ex)
+                {
+                    Exception asyncEx = ex.GetBaseException();
+                    //Error thrown from the backend api such as a 500 when we send an invalid ID?
+                    if (asyncEx is HttpRequestException)
+                    {
+                        //TODO: Log exception here
+                        //Log the error but still render the item
+                    }
+                }
+            }
+            
+
+
+            return View("Codex", entryModel);
         }
 
         [Route("/Lookup/Error")]
