@@ -17,7 +17,7 @@
               asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
         <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
-        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
+        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     </environment>
     @Html.Raw(JavaScriptSnippet.FullScript)
 </head>
@@ -62,10 +62,40 @@
                     crossorigin="anonymous"
                     integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa">
             </script>
-            <script src="~/js/site.min.js" asp-append-version="true"></script>
+            <script src="~/js/site.js" asp-append-version="true"></script>
         </environment>
 
         @RenderSection("Scripts", required: false)
 
+        <script language="JavaScript">
+/*
+ * Derived from EDSM iframe content script
+ *
+ * Elite: Dangerous Star Map
+ *
+ * link        https://www.edsm.net/
+ * copyright   Copyright (c) 2015-2017 EDSM.
+ * used with permission
+*/
+
+//Used to send a message to the parent page so it can update the content size
+var sendResize = function () {
+    message = JSON.stringify({
+        message: 'canonn_content_update',
+        href: window.location.href,
+        height: Math.max(
+            document.body.scrollHeight,
+            document.body.offsetHeight,
+            document.documentElement.clientHeight,
+            document.documentElement.scrollHeight,
+            document.documentElement.offsetHeight
+        )
+    });
+    parent.postMessage(message,'*');
+};
+
+window.onload   = sendResize;
+window.onresize = sendResize;
+        </script>
 </body>
 </html>

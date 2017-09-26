@@ -5,11 +5,22 @@
     <PackageTargetFallback>$(PackageTargetFallback);portable-net45+win8+wp8+wpa81;</PackageTargetFallback>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>pdbonly</DebugType>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Remove="wwwroot\test\**" />
     <Content Remove="wwwroot\test\**" />
     <EmbeddedResource Remove="wwwroot\test\**" />
     <None Remove="wwwroot\test\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="wwwroot\canonn-embed.js" />
+    <Content Remove="wwwroot\lib\site.js" />
+    <Content Remove="wwwroot\site.js" />
   </ItemGroup>
 
   <ItemGroup>

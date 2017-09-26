@@ -54,6 +54,7 @@ namespace Heimdallr
             else
             {
                 app.UseExceptionHandler("/Lookup/Error");
+                app.UseStaticFiles();
             }
 
 

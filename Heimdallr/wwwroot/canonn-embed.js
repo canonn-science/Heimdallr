@@ -4,7 +4,7 @@
     window.canonnEmbed = function () {
         this.maxWidth = '840px';
         this.maxHeight = '900px';
-        this.queryURL = 'https://info.canonn.technology/Lookup/';
+        this.queryURL = 'http://localhost:56711/Lookup/';
         this.frameCount = 0;
 
         this.handleMessage = function messageHandler(m) {

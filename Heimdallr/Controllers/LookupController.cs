@@ -37,9 +37,18 @@ namespace Heimdallr.Controllers
             return View();
         }
 
+
+        [Route("/QuickTest")]
+        public IActionResult QuickTest()
+        {
+            Console.WriteLine("QuickTest View");
+            return View();
+        }
+
         [Route("/Test")]
         public IActionResult Test()
         {
+            Console.WriteLine("Test View");
             return View();
         }
 
@@ -47,7 +56,7 @@ namespace Heimdallr.Controllers
         [Route("/Lookup/GR{siteNum:int}")]
         public IActionResult Guardian(int siteNum)
         {
-
+            Console.WriteLine("guardiansite:" + siteNum.ToString());
             string guardianJSON = "";
             try
             {
@@ -79,6 +88,8 @@ namespace Heimdallr.Controllers
         [Route("/Lookup/TS{siteNum:int}")]
         public IActionResult ThargoidSite(int siteNum)
         {
+            Console.WriteLine("thargoidsite:" + siteNum.ToString());
+
             ThargoidSite matchingSite = null;
             string thargoidCSV = "";
             try
@@ -165,25 +176,13 @@ namespace Heimdallr.Controllers
         }
 
 
-        private IActionResult CodexPostByPath(string postSlug)
-        {
-            
-            ViewData["Message"] = "Some Codex Post with Slug " + postSlug;
-            return View("Codex");
-        }
-
-        private IActionResult CodexPageByPath(string pageRef)
-        {
-
-            ViewData["Message"] = "Some Codex Page by URL " + pageRef;
-            return View("Codex");
-        }
 
         [Route("/Lookup/{*query}")]
         public IActionResult Codex(string query)
         {
             StringBuilder apiCall = new StringBuilder(_canonnWebAPISettings.Value.resourceLocation);
-            
+
+            Console.WriteLine("codex:" + query);
 
             //Ruin map direct link [https://ruins.canonn.technology/#GR25 OR https://ruins.canonn.technology/#GS25]
             MatchCollection thargoidCheck = Regex.Matches(query, ".*ruins.canonn.technology/#(GR|GS)([0-9]+)");
@@ -197,8 +196,8 @@ namespace Heimdallr.Controllers
             //Codex entry? [https://canonn.science/codex/unknown-probe/]
             MatchCollection codexCheck = Regex.Matches(query, ".*canonn.science/codex/(.*)");
 
-            //Lore entry? [https://canonn.science/lore/]
-            MatchCollection loreCheck = Regex.Matches(query, ".*canonn.science/(.*)");
+            ////Lore entry? [https://canonn.science/lore/]
+            //MatchCollection loreCheck = Regex.Matches(query, ".*canonn.science/(.*)");
 
 
             if (codexCheck.Count == 1)
@@ -208,18 +207,20 @@ namespace Heimdallr.Controllers
 
                 apiCall.Append("posts?slug=");
                 apiCall.Append(WebUtility.UrlEncode(query));
-            }else if (loreCheck.Count == 1)
-            {
-                //Query param is the page path (removing any trailing paths)
-                query = loreCheck[0].Groups[1].Value.Replace("/","");
+            }
+            //else if (loreCheck.Count == 1)
+            //{
+            //    //Query param is the page path (removing any trailing paths)
+            //    query = loreCheck[0].Groups[1].Value.Replace("/","");
 
-                apiCall.Append("pages?slug=");
-                apiCall.Append(WebUtility.UrlEncode(query));
+            //    apiCall.Append("pages?slug=");
+            //    apiCall.Append(WebUtility.UrlEncode(query));
 
-            }else
+            //}
+            else
             {
                 //Query param is the search term
-                apiCall.Append("posts?search=");
+                apiCall.Append("posts?categories=2&search=");
                 apiCall.Append(WebUtility.UrlEncode(query));
 
             }

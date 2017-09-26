@@ -1,0 +1,91 @@
+﻿@{
+    Layout = null;
+}
+<html>
+
+<style>
+    body {
+        background-color: lightgray;
+    }
+
+    .post{
+        background-color: lightgray;
+        border:1px solid black;
+    }
+
+    .small {
+        height: 293px;
+        width: 700px;
+    }
+
+    .small li {
+        width: 1791px;
+        height:293px;
+    }
+
+    .large{
+        height:500px;
+        width: 900px;
+    }
+    
+    .blockrow {
+        background: rgba(43,43,43,0.8) none;
+        padding: 6px 12px 6px 12px;
+        border: 1px solid rgba(50,50,50,0.8);
+        color: rgb(216, 216, 216);
+        
+    }
+
+    
+</style>
+
+
+<input type="text" name="bbcterm" id="bbcterm" onkeyup="javascript: if (event.keyCode == 13) { processFrame(); };"/>
+<input type="button" value="Test Term" id="testbbc" onclick="javascript: processFrame();"/>
+
+<div class="block bbcodeblock small">
+    
+    <div class="blockbody">
+        <ul class="codeblock">
+            <li class="blockrow floatcontainer">
+                <div class="desc" id="sample-post-div">
+                    Sample Div
+                </div>
+                
+            </li>
+        </ul>
+    </div>
+</div>
+    
+
+<script language="JavaScript">
+    function processFrame() {
+        var term = document.getElementById('bbcterm').value;
+        if ('' === term) {
+            alert('Invalid BBC Code Term');
+            return;
+        }
+
+        var hostdiv = document.getElementById('sample-post-div');
+
+        var bq = document.createElement("blockquote");
+        bq.className = "canonn-embed";
+        bq.setAttribute("data-value", term);
+        hostdiv.innerHTML = "";
+        hostdiv.appendChild(bq);
+
+
+        var script = document.createElement("script");
+        script.type = "text/javascript",
+        script.async = !0,
+        script.src = "/js/canonn-embed.js",
+        script.charset = "utf-8",
+        hostdiv.appendChild(script);
+
+        
+
+    }
+</script>
+
+</body>
+</html>
