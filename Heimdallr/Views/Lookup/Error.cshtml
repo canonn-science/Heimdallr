@@ -1,11 +1,26 @@
-﻿@{
+﻿@model Heimdallr.ResourceException
+
+@{
     ViewData["Title"] = "Error";
+    ViewData["Heading"] = "Error";
+    ViewData["ResourceLink"] = string.Format("https://canonn.science/?s={0}", Model.queryContext);
 }
 
-@model System.Exception
 
+<div class="row">
+    <div class="col-xs-12 text-uppercase">
+        <h1> Error Encountered </h1>
+    </div>
+</div>
 
-<h3>@ViewData["Message"]</h3>
-<div>
-    Error Test Item Here @Model.Message
+<div class="row">
+    <div class="col-xs-12">
+        @Model.Message
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-xs-12">
+        <a href="@ViewData["ResourceLink"]" target="_blank">Search on Canonn.Science</a>
+    </div>
 </div>

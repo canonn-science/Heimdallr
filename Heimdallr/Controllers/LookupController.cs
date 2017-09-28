@@ -70,12 +70,12 @@ namespace Heimdallr.Controllers
                 Exception asyncEx = ex.GetBaseException();
                 //Error thrown from the backend api such as a 500 when we send an invalid ID?
                 if (asyncEx is HttpRequestException){
-                    throw new Exception("Unable to retrieve the specified Guardian Ruin.  Please check that the Ruin ID is correct.");
+                    throw new ResourceException("Unable to retrieve the specified Guardian Ruin.  Please check that the Ruin ID is correct.","GR" + siteNum);
                 }
 
                 //No.  Log it
                 //TODO: Log exception here
-                throw new Exception("Unexpected error when trying to retrieve Guardian Ruin");
+                throw new ResourceException("Unexpected error when trying to retrieve Guardian Ruin", "GR" + siteNum);
             }
 
             GuardianRuin ruinInfo = JsonConvert.DeserializeObject<GuardianRuin>(guardianJSON);
@@ -168,14 +168,12 @@ namespace Heimdallr.Controllers
 
             if(matchingSite == null)
             {
-                throw new Exception("Unable to find a matching Thargoid Site");
+                throw new ResourceException("Unable to find a matching Thargoid Site","TS" + siteNum);
             }
             
 
             return View("ThargoidSite", matchingSite);
         }
-
-
 
         [Route("/Lookup/{*query}")]
         public IActionResult Codex(string query)
@@ -185,20 +183,16 @@ namespace Heimdallr.Controllers
             Console.WriteLine("codex:" + query);
 
             //Ruin map direct link [https://ruins.canonn.technology/#GR25 OR https://ruins.canonn.technology/#GS25]
-            MatchCollection thargoidCheck = Regex.Matches(query, ".*ruins.canonn.technology/#(GR|GS)([0-9]+)");
-            if (thargoidCheck.Count == 1)
+            MatchCollection ruinCheck = Regex.Matches(query, ".*ruins.canonn.technology/#(GR|GS)([0-9]+)");
+            if (ruinCheck.Count == 1)
             {
                 //Query param is the site number.  
-                query = thargoidCheck[0].Groups[2].Value;
-                return ThargoidSite(Int32.Parse(query));
-            }
+                query = ruinCheck[0].Groups[2].Value;
+                return Guardian(Int32.Parse(query));
+            }      
 
             //Codex entry? [https://canonn.science/codex/unknown-probe/]
             MatchCollection codexCheck = Regex.Matches(query, ".*canonn.science/codex/(.*)");
-
-            ////Lore entry? [https://canonn.science/lore/]
-            //MatchCollection loreCheck = Regex.Matches(query, ".*canonn.science/(.*)");
-
 
             if (codexCheck.Count == 1)
             {
@@ -208,15 +202,6 @@ namespace Heimdallr.Controllers
                 apiCall.Append("posts?slug=");
                 apiCall.Append(WebUtility.UrlEncode(query));
             }
-            //else if (loreCheck.Count == 1)
-            //{
-            //    //Query param is the page path (removing any trailing paths)
-            //    query = loreCheck[0].Groups[1].Value.Replace("/","");
-
-            //    apiCall.Append("pages?slug=");
-            //    apiCall.Append(WebUtility.UrlEncode(query));
-
-            //}
             else
             {
                 //Query param is the search term
@@ -239,20 +224,19 @@ namespace Heimdallr.Controllers
                 //Error thrown from the backend api such as a 500 when we send an invalid ID?
                 if (asyncEx is HttpRequestException)
                 {
-                    //TODO: Add direct search handling https://canonn.science/?s=example
-                    throw new Exception("Unable to find the specified entry on the Canonn website.");
+                    throw new ResourceException("Unable to find the specified entry on the Canonn website.",query);
                 }
 
                 //No.  Log it
                 //TODO: Log exception here
-                throw new Exception("Unexpected error when trying to retrieve the entry from the Canonn website");
+                throw new ResourceException("Unexpected error when trying to retrieve the entry from the Canonn website",query);
             }
 
             CanonnEntry[] canonnEntries = JsonConvert.DeserializeObject<CanonnEntry[]>(apiJSON);
 
             if(canonnEntries.Length < 1)
             {
-                throw new Exception("Unable to find the specified entry on the Canonn website.");
+                throw new ResourceException("Unable to find the specified entry on the Canonn website.",query);
             }
 
             CanonnEntry entryModel = canonnEntries[0];
@@ -260,7 +244,7 @@ namespace Heimdallr.Controllers
 
             
             //Media item?
-            if(entryModel.featured_media > 0)
+            if(entryModel.featured_media > 0 )
             {
                 string mediaJSON = "";
                 StringBuilder mediaCall = new StringBuilder(_canonnWebAPISettings.Value.resourceLocation);
