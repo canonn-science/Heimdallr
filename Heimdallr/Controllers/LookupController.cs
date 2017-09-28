@@ -191,6 +191,11 @@ namespace Heimdallr.Controllers
         [Route("/Lookup/{*query}")]
         public IActionResult Codex(string query)
         {
+            if(query == null)
+            {
+                return View("Index");
+            }
+
             StringBuilder apiCall = new StringBuilder(_canonnWebAPISettings.Value.resourceLocation);
 
             Console.WriteLine("codex:" + query);
