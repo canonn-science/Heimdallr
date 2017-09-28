@@ -4,7 +4,7 @@
     window.canonnEmbed = function () {
         this.maxWidth = '840px';
         this.maxHeight = '900px';
-        this.queryURL = '/Lookup/';
+        this.queryURL = window.canonnEmbedURLOverride || 'https://info.canonn.technology/Lookup/'; 
         this.frameCount = 0;
 
         this.handleMessage = function messageHandler(m) {
@@ -59,17 +59,14 @@
                 newFrame.id = "canonn-embed-iframe-" + window.canonnEmbed.frameCount;
                 newFrame.className = "canonn-embed-iframe-" + encodeURIComponent(embedCode).replace(/[\W_]+/g, "");
 
-                
-
-               
-
                 newFrame.style.maxWidth = window.canonnEmbed.maxWidth;
                 newFrame.style.maxHeight = window.canonnEmbed.maxHeight;
                 newFrame.style.width = '100%';
                 newFrame.height = '150px';
 
-                newFrame.style.background = 'url(https://info.canonn.technology/images/canonn-loading.png) center center no-repeat';
+                newFrame.style.background = 'url(https://info.canonn.technology/images/canonn-loading.gif) center center no-repeat';
                 newFrame.style.backgroundSize = '150px 150px';
+                newFrame.style.backgroundColor = '#222222';
 
                 newFrame.style.border = 'none';
                 newFrame.style.margin = "10px 0px";

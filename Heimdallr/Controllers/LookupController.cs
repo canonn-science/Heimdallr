@@ -70,12 +70,12 @@ namespace Heimdallr.Controllers
                 Exception asyncEx = ex.GetBaseException();
                 //Error thrown from the backend api such as a 500 when we send an invalid ID?
                 if (asyncEx is HttpRequestException){
-                    throw new ResourceException("Unable to retrieve the specified Guardian Ruin.  Please check that the Ruin ID is correct.","GR" + siteNum);
+                    throw new ResourceException("Sorry but we're unable to retrieve the specified Guardian Ruin.  Please check that the Ruin ID is correct.","GR" + siteNum);
                 }
 
                 //No.  Log it
                 //TODO: Log exception here
-                throw new ResourceException("Unexpected error when trying to retrieve Guardian Ruin", "GR" + siteNum);
+                throw new ResourceException("There was an unexpected error when trying to retrieve Guardian Ruin", "GR" + siteNum);
             }
 
             GuardianRuin ruinInfo = JsonConvert.DeserializeObject<GuardianRuin>(guardianJSON);
@@ -168,11 +168,24 @@ namespace Heimdallr.Controllers
 
             if(matchingSite == null)
             {
-                throw new ResourceException("Unable to find a matching Thargoid Site","TS" + siteNum);
+                throw new ResourceException("Sorry but we're unable to find a matching Thargoid Site", "TS" + siteNum);
             }
             
 
             return View("ThargoidSite", matchingSite);
+        }
+
+        private string WhiteListString(string input,string whitelist = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+        {
+            StringBuilder sanitizedString = new StringBuilder();
+            foreach (char c in input)
+            {
+                if (whitelist.IndexOf(c) > -1)
+                {
+                    sanitizedString.Append(c);
+                }
+            }
+            return sanitizedString.ToString();
         }
 
         [Route("/Lookup/{*query}")]
@@ -188,7 +201,15 @@ namespace Heimdallr.Controllers
             {
                 //Query param is the site number.  
                 query = ruinCheck[0].Groups[2].Value;
-                return Guardian(Int32.Parse(query));
+
+                Int32 guardianId = 0;
+
+                if(!Int32.TryParse(query, out guardianId))
+                {
+                    throw new ResourceException("Unable to retrieve the Guardian ID due to an invalid ID", query);
+                }
+
+                return Guardian(guardianId);
             }      
 
             //Codex entry? [https://canonn.science/codex/unknown-probe/]
@@ -199,12 +220,19 @@ namespace Heimdallr.Controllers
                 //Query param is the codex page (removing any trailing paths)
                 query = codexCheck[0].Groups[1].Value.Replace("/", "");
 
+                //Cleanup using slug whitelist
+                query = WhiteListString(query, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_");
+
                 apiCall.Append("posts?slug=");
                 apiCall.Append(WebUtility.UrlEncode(query));
             }
             else
             {
                 //Query param is the search term
+                
+                //Cleanup using search whitelist
+                query = WhiteListString(query, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#&()+,-/: _;!@");
+
                 apiCall.Append("posts?categories=2&search=");
                 apiCall.Append(WebUtility.UrlEncode(query));
 
@@ -224,19 +252,19 @@ namespace Heimdallr.Controllers
                 //Error thrown from the backend api such as a 500 when we send an invalid ID?
                 if (asyncEx is HttpRequestException)
                 {
-                    throw new ResourceException("Unable to find the specified entry on the Canonn website.",query);
+                    throw new ResourceException("Sorry but we're unable to find the specified entry on the Canonn website.", query);
                 }
 
                 //No.  Log it
                 //TODO: Log exception here
-                throw new ResourceException("Unexpected error when trying to retrieve the entry from the Canonn website",query);
+                throw new ResourceException("There was an unexpected error when trying to retrieve the entry from the Canonn website",query);
             }
 
             CanonnEntry[] canonnEntries = JsonConvert.DeserializeObject<CanonnEntry[]>(apiJSON);
 
             if(canonnEntries.Length < 1)
             {
-                throw new ResourceException("Unable to find the specified entry on the Canonn website.",query);
+                throw new ResourceException("Sorry but we're unable to find the specified entry on the Canonn website.", query);
             }
 
             CanonnEntry entryModel = canonnEntries[0];

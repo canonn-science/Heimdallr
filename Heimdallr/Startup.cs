@@ -45,6 +45,8 @@ namespace Heimdallr
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
+            app.UseExceptionHandler("/Lookup/Error");
+
             if (env.IsDevelopment())
             {
                 //app.UseDeveloperExceptionPage();
@@ -53,7 +55,7 @@ namespace Heimdallr
             }
             else
             {
-                app.UseExceptionHandler("/Lookup/Error");
+                
                 app.UseStaticFiles();
             }
 

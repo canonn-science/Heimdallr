@@ -1,26 +1,19 @@
 ﻿@model Heimdallr.ResourceException
 
 @{
-    ViewData["Title"] = "Error";
-    ViewData["Heading"] = "Error";
+    ViewData["Title"] = "Unable to Find the Specified Term";
+    ViewData["Heading"] = "Unable to Find the Specified Term";
     ViewData["ResourceLink"] = string.Format("https://canonn.science/?s={0}", Model.queryContext);
 }
 
-
 <div class="row">
-    <div class="col-xs-12 text-uppercase">
-        <h1> Error Encountered </h1>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-xs-12">
+    <div class="col-xs-12 text-center">
         @Model.Message
     </div>
 </div>
 
 <div class="row">
-    <div class="col-xs-12">
+    <div class="col-xs-12 text-center">
         <a href="@ViewData["ResourceLink"]" target="_blank">Search on Canonn.Science</a>
     </div>
 </div>

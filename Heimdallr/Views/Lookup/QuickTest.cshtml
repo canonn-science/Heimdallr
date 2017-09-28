@@ -56,9 +56,12 @@
         </ul>
     </div>
 </div>
-    
+
 
 <script language="JavaScript">
+    //Supply an override url to be used by the embedded script
+    window.canonnEmbedURLOverride = '/Lookup/'
+
     function processFrame() {
         var term = document.getElementById('bbcterm').value;
         if ('' === term) {
