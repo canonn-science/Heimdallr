@@ -1,34 +1,55 @@
 ﻿@model Heimdallr.Models.ThargoidSite
 
 @{
-    ViewData["Title"] = "Thargoid Site from Canonn";
-    ViewData["Heading"] = "Thargoid Site " + @Model.SiteID;
+    ViewData["Title"] = "Thargoid Structure from Canonn";
+    ViewData["Heading"] = "Thargoid Structure " + @Model.SiteID;
     ViewData["ResourceLink"] = "https://map.canonn.technology/us/";
 }
 
 
 
+
+
+
+
+
+
+
 <div class="row">
-    <div class="col-xs-5 col-md-3">
+    <div class="col-xs-4 col-md-3">
         <div class="row">
             <div class="col-xs-12 canonn-thumbnail">
-                <img src="https://map.canonn.technology/us/us_sites_mapping/img/planet_grid.png" class="img-responsive" />
+                <img src="/images/thargoid_structure.png" class="img-responsive" />
             </div>
         </div>
     </div>
 
-    <div class="col-xs-7 col-md-9">
+    <div class="col-xs-2 col-md-2">
         <div class="row">
-            <div class="col-md-6 text-center text-uppercase">
-                <h1 class="@((Model.Active)? "ts-active" : "ts-inactive")"> @((Model.Active)? "Active" : "Inactive") </h1>
+            <div class="col-xs-12 canonn-thumbnail">
+                <h1 class="ts-type @((Model.Active)? "active" : "inactive")"> @((Model.Active) ? "Active" : "Inactive") </h1>
+
+                <div class="text-center">
+                    <div class="helptext">Points to:</div>
+                    
+                    
+
+                    <div class="ts-msg-pointer inactive">@((Model.MessageSite1 > 0) ? "TS" + Model.MessageSite1 : "none")</div>
+                    <div class="ts-msg-pointer inactive">@((Model.MessageSite2 > 0) ? "TS" + Model.MessageSite2 : "none")</div>
+                    <div class="ts-msg-pointer inactive">@((Model.MessageSite3 > 0) ? "TS" + Model.MessageSite3 : "none")</div>
+                </div>
             </div>
         </div>
+    </div>
+
+    <div class="col-xs-6 col-md-7">
+        &nbsp;
         <div class="row">
             <div class="col-md-3">
-                <h4>@Model.SystemName</h4>
+                <h4 class="system">@Model.SystemName</h4>
             </div>
             <div class="col-md-3">
-                <h6>@Model.BodyName</h6>
+                <h4 class="body">Body: @Model.BodyName</h4>
             </div>
         </div>
         <div class="row">
@@ -52,7 +73,6 @@
                 <a href="@ViewData["ResourceLink"]" target="_blank">View Thargoid Site Map</a>
             </div>
         </div>
+
     </div>
-
-
 </div>

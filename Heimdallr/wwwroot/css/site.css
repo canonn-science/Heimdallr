@@ -63,6 +63,11 @@ h4 {
     color: #888;
 }
 
+h4.system {
+    font-size: 150%;
+    color: #efefef;
+}
+
 h5 {
     font-size: 18px;
     color: #888;
@@ -88,4 +93,23 @@ body {
     border: 1px solid #ddd;
     color: black !important;
     font-weight: bold;
+}
+
+
+.ts-type {
+    margin: 25px 0 10px 0;
+    padding: 15px 10px;
+    background: #ff7c24;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.ts-type.active {
+    background: #ff7c24 !important;
+    color: #fff !important;
+}
+
+.ts-msg-pointer.active {
+    color: #ff7c24 !important;
+    background-color: #cd4d26 !important;
 }
