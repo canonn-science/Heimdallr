@@ -222,8 +222,14 @@ namespace Heimdallr.Controllers
 
             if (codexCheck.Count == 1)
             {
-                //Query param is the codex page (removing any trailing paths)
-                query = codexCheck[0].Groups[1].Value.Replace("/", "");
+                
+                //Query param is the codex page 
+                query = codexCheck[0].Groups[1].Value;
+                //removing any trailing paths
+                query = query.TrimEnd('/');
+
+                //Parse out any paths such as [https://canonn.science/codex/xenobiology/cmdr-panpiper-a-brief-history-of-brain-trees/]
+                query = query.Split('/').Last();
 
                 //Cleanup using slug whitelist
                 query = WhiteListString(query, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-_");
