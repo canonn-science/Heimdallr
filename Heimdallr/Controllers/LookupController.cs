@@ -92,79 +92,97 @@ namespace Heimdallr.Controllers
 
             ThargoidSite matchingSite = null;
             string thargoidCSV = "";
+            
+
             try
             {
-                thargoidCSV = Task.Run(() =>
+                try
                 {
-                    return GetUrlContents(_thargoidSiteSettings.Value.resourceLocation);
-                }).Result;
+                    thargoidCSV = Task.Run(() =>
+                    {
+                        return GetUrlContents(_thargoidSiteSettings.Value.resourceLocation);
+                    }).Result;
+                }
+                catch (Exception ex)
+                {
+                    Exception asyncEx = ex.GetBaseException();
+
+                    //TODO: Log exception here 
+                    //Rethrow it
+                    throw;
+                }
+
+                using (StringReader reader = new StringReader(thargoidCSV))
+                {
+                    string line;
+                    decimal Lat = 0;
+                    decimal Lng = 0;
+                    bool isValid = true;
+
+
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        if (line.StartsWith("us_name,"))
+                        {
+                            //Header
+                        }
+                        else
+                        {
+                            isValid = true;
+                            //Data.  Get the pieces and if valid add a line item 
+                            string[] data = line.Split(',');
+                            if (data.Length == 12)
+                            {
+                                if(data[0].Length > 0)
+                                {
+                                    ThargoidSite newSite = new ThargoidSite();
+
+                                    //us_name,system,x,y,z,planet,lat,lng,active,msg1,msg2,msg3
+                                    newSite.SiteID = Int32.Parse(Regex.Replace(data[0], "[^0-9]", ""));
+
+                                    //us_name,system,x,y,z,planet,lat,lng,active,msg1,msg2,msg3
+                                    newSite.SystemName = data[1];
+                                    isValid = isValid & (newSite.SystemName.Length > 0);
+
+
+                                    newSite.BodyName = data[5];
+                                    isValid = isValid & decimal.TryParse(data[6], out Lat);
+                                    isValid = isValid & decimal.TryParse(data[7], out Lng);
+
+                                    newSite.Coordinates = new decimal[] { 0, 0 };
+                                    newSite.Coordinates[0] = Lat;
+                                    newSite.Coordinates[1] = Lng;
+
+
+                                    newSite.Active = (data[8] == "Y");
+                                    newSite.MessageSite1 = Int32.Parse(Regex.Replace("0" + data[9], "[^0-9]", ""));
+                                    newSite.MessageSite2 = Int32.Parse(Regex.Replace("0" + data[10], "[^0-9]", ""));
+                                    newSite.MessageSite3 = Int32.Parse(Regex.Replace("0" + data[11], "[^0-9]", ""));
+
+                                    if (isValid)
+                                    {
+                                        if (newSite.SiteID == siteNum)
+                                        {
+                                            matchingSite = newSite;
+                                        }
+                                    }
+                                }
+                                
+                            }
+                        }
+
+                    }
+                }
             }
             catch (Exception ex)
             {
-                Exception asyncEx = ex.GetBaseException();
-
                 //TODO: Log exception here 
-                //Rethrow it
-                throw;
+
+
+                throw new ResourceException("There was an issue during the Thargoid Site lookup", "TS" + siteNum);
             }
 
-            using (StringReader reader = new StringReader(thargoidCSV))
-            {
-                string line;
-                decimal Lat = 0;
-                decimal Lng = 0;
-                bool isValid = true;
-                
-
-                while ((line = reader.ReadLine()) != null)
-                {
-                    if (line.StartsWith("us_name,"))
-                    {
-                        //Header
-                    }
-                    else
-                    {
-                        isValid = true;
-                        //Data.  Get the pieces and if valid add a line item 
-                        string[] data = line.Split(',');
-                        if (data.Length == 12)
-                        {
-                            ThargoidSite newSite = new ThargoidSite();
-
-                            //us_name,system,x,y,z,planet,lat,lng,active,msg1,msg2,msg3
-                            newSite.SiteID = Int32.Parse(Regex.Replace(data[0], "[^0-9]", ""));
-
-                            //us_name,system,x,y,z,planet,lat,lng,active,msg1,msg2,msg3
-                            newSite.SystemName = data[1];
-                            isValid = isValid & (newSite.SystemName.Length > 0);
-
-
-                            newSite.BodyName = data[5];
-                            isValid = isValid & decimal.TryParse(data[6], out Lat);
-                            isValid = isValid & decimal.TryParse(data[7], out Lng);
-
-                            newSite.Coordinates = new decimal[] { 0, 0 };
-                            newSite.Coordinates[0] = Lat;
-                            newSite.Coordinates[1] = Lng;
-                            
-
-                            newSite.Active = (data[8] == "Y");
-                            newSite.MessageSite1 = Int32.Parse(Regex.Replace("0" + data[9], "[^0-9]", ""));
-                            newSite.MessageSite2 = Int32.Parse(Regex.Replace("0" + data[10], "[^0-9]", ""));
-                            newSite.MessageSite3 = Int32.Parse(Regex.Replace("0" + data[11], "[^0-9]", ""));
-
-                            if (isValid)
-                            {
-                                if(newSite.SiteID == siteNum)
-                                {
-                                    matchingSite = newSite;
-                                }
-                            }
-                        }
-                    }
-
-                }
-            }
+            
 
             if(matchingSite == null)
             {
